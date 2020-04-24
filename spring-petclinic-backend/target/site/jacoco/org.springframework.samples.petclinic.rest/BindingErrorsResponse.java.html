@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BindingErrorsResponse.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-petclinic-rest</a> &gt; <a href="index.source.html" class="el_package">org.springframework.samples.petclinic.rest</a> &gt; <span class="el_source">BindingErrorsResponse.java</span></div><h1>BindingErrorsResponse.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2016 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.rest;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+/**
+ * @author Vitaliy Fedoriv
+ *
+ */
+
+public class BindingErrorsResponse {
+
+    public BindingErrorsResponse() {
+<span class="fc" id="L38">        this(null);</span>
+<span class="fc" id="L39">    }</span>
+
+    public BindingErrorsResponse(Integer id) {
+<span class="fc" id="L42">        this(null, id);</span>
+<span class="fc" id="L43">    }</span>
+
+<span class="fc" id="L45">    public BindingErrorsResponse(Integer pathId, Integer bodyId) {</span>
+<span class="fc bfc" id="L46" title="All 4 branches covered.">        boolean onlyBodyIdSpecified = pathId == null &amp;&amp; bodyId != null;</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        if (onlyBodyIdSpecified) {</span>
+<span class="fc" id="L48">            addBodyIdError(bodyId, &quot;must not be specified&quot;);</span>
+        }
+<span class="pc bpc" id="L50" title="1 of 4 branches missed.">        boolean bothIdsSpecified = pathId != null &amp;&amp; bodyId != null;</span>
+<span class="fc bfc" id="L51" title="All 4 branches covered.">        if (bothIdsSpecified &amp;&amp; !pathId.equals(bodyId)) {</span>
+<span class="fc" id="L52">            addBodyIdError(bodyId, String.format(&quot;does not match pathId: %d&quot;, pathId));</span>
+        }
+<span class="fc" id="L54">    }</span>
+
+    private void addBodyIdError(Integer bodyId, String message) {
+<span class="fc" id="L57">        BindingError error = new BindingError();</span>
+<span class="fc" id="L58">        error.setObjectName(&quot;body&quot;);</span>
+<span class="fc" id="L59">        error.setFieldName(&quot;id&quot;);</span>
+<span class="fc" id="L60">        error.setFieldValue(bodyId.toString());</span>
+<span class="fc" id="L61">        error.setErrorMessage(message);</span>
+<span class="fc" id="L62">        addError(error);</span>
+<span class="fc" id="L63">    }</span>
+
+<span class="fc" id="L65">	private List&lt;BindingError&gt; bindingErrors = new ArrayList&lt;BindingError&gt;();</span>
+
+	public void addError(BindingError bindingError) {
+<span class="fc" id="L68">		this.bindingErrors.add(bindingError);</span>
+<span class="fc" id="L69">	}</span>
+
+	public void addAllErrors(BindingResult bindingResult) {
+<span class="fc bfc" id="L72" title="All 2 branches covered.">		for (FieldError fieldError : bindingResult.getFieldErrors()) {</span>
+<span class="fc" id="L73">			BindingError error = new BindingError();</span>
+<span class="fc" id="L74">			error.setObjectName(fieldError.getObjectName());</span>
+<span class="fc" id="L75">			error.setFieldName(fieldError.getField());</span>
+<span class="fc" id="L76">			error.setFieldValue(fieldError.getRejectedValue().toString());</span>
+<span class="fc" id="L77">			error.setErrorMessage(fieldError.getDefaultMessage());</span>
+<span class="fc" id="L78">			addError(error);</span>
+<span class="fc" id="L79">		}</span>
+<span class="fc" id="L80">	}</span>
+
+	public String toJSON() {
+<span class="fc" id="L83">		ObjectMapper mapper = new ObjectMapper();</span>
+<span class="fc" id="L84">		mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);</span>
+<span class="fc" id="L85">		String errorsAsJSON = &quot;&quot;;</span>
+		try {
+<span class="fc" id="L87">			errorsAsJSON = mapper.writeValueAsString(bindingErrors);</span>
+<span class="nc" id="L88">		} catch (JsonProcessingException e) {</span>
+<span class="nc" id="L89">			e.printStackTrace();</span>
+<span class="fc" id="L90">		}</span>
+<span class="fc" id="L91">		return errorsAsJSON;</span>
+	}
+
+	@Override
+	public String toString() {
+<span class="nc" id="L96">		return &quot;BindingErrorsResponse [bindingErrors=&quot; + bindingErrors + &quot;]&quot;;</span>
+	}
+
+	protected class BindingError {
+
+		private String objectName;
+		private String fieldName;
+		private String fieldValue;
+		private String errorMessage;
+
+<span class="fc" id="L106">		public BindingError() {</span>
+<span class="fc" id="L107">			this.objectName = &quot;&quot;;</span>
+<span class="fc" id="L108">			this.fieldName = &quot;&quot;;</span>
+<span class="fc" id="L109">			this.fieldValue = &quot;&quot;;</span>
+<span class="fc" id="L110">			this.errorMessage = &quot;&quot;;</span>
+<span class="fc" id="L111">		}</span>
+
+		protected void setObjectName(String objectName) {
+<span class="fc" id="L114">			this.objectName = objectName;</span>
+<span class="fc" id="L115">		}</span>
+
+		protected void setFieldName(String fieldName) {
+<span class="fc" id="L118">			this.fieldName = fieldName;</span>
+<span class="fc" id="L119">		}</span>
+
+		protected void setFieldValue(String fieldValue) {
+<span class="fc" id="L122">			this.fieldValue = fieldValue;</span>
+<span class="fc" id="L123">		}</span>
+
+		protected void setErrorMessage(String error_message) {
+<span class="fc" id="L126">			this.errorMessage = error_message;</span>
+<span class="fc" id="L127">		}</span>
+
+		@Override
+		public String toString() {
+<span class="nc" id="L131">			return &quot;BindingError [objectName=&quot; + objectName + &quot;, fieldName=&quot; + fieldName + &quot;, fieldValue=&quot; + fieldValue</span>
+					+ &quot;, errorMessage=&quot; + errorMessage + &quot;]&quot;;
+		}
+
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

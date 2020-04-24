@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JdbcPetTypeRepositoryImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-petclinic-rest</a> &gt; <a href="index.source.html" class="el_package">org.springframework.samples.petclinic.repository.jdbc</a> &gt; <span class="el_source">JdbcPetTypeRepositoryImpl.java</span></div><h1>JdbcPetTypeRepositoryImpl.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.repository.jdbc;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.orm.ObjectRetrievalFailureException;
+import org.springframework.samples.petclinic.model.Pet;
+import org.springframework.samples.petclinic.model.PetType;
+import org.springframework.samples.petclinic.model.Visit;
+import org.springframework.samples.petclinic.repository.PetTypeRepository;
+import org.springframework.stereotype.Repository;
+
+/**
+ * @author Vitaliy Fedoriv
+ *
+ */
+
+@Repository
+@Profile(&quot;jdbc&quot;)
+public class JdbcPetTypeRepositoryImpl implements PetTypeRepository {
+	
+	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+	
+	private SimpleJdbcInsert insertPetType;
+	
+	@Autowired
+<span class="fc" id="L56">	public JdbcPetTypeRepositoryImpl(DataSource dataSource) {</span>
+<span class="fc" id="L57">		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);</span>
+<span class="fc" id="L58">		this.insertPetType = new SimpleJdbcInsert(dataSource)</span>
+<span class="fc" id="L59">	            .withTableName(&quot;types&quot;)</span>
+<span class="fc" id="L60">	            .usingGeneratedKeyColumns(&quot;id&quot;);</span>
+<span class="fc" id="L61">	}</span>
+
+	@Override
+	public PetType findById(int id) {
+		PetType petType;
+        try {
+<span class="fc" id="L67">            Map&lt;String, Object&gt; params = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L68">            params.put(&quot;id&quot;, id);</span>
+<span class="fc" id="L69">            petType = this.namedParameterJdbcTemplate.queryForObject(</span>
+                &quot;SELECT id, name FROM types WHERE id= :id&quot;,
+                params,
+<span class="fc" id="L72">                BeanPropertyRowMapper.newInstance(PetType.class));</span>
+<span class="fc" id="L73">        } catch (EmptyResultDataAccessException ex) {</span>
+<span class="fc" id="L74">            throw new ObjectRetrievalFailureException(PetType.class, id);</span>
+<span class="fc" id="L75">        }</span>
+<span class="fc" id="L76">        return petType;</span>
+	}
+
+	@Override
+	public Collection&lt;PetType&gt; findAll() throws DataAccessException {
+<span class="fc" id="L81">		Map&lt;String, Object&gt; params = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L82">        return this.namedParameterJdbcTemplate.query(</span>
+            &quot;SELECT id, name FROM types&quot;,
+            params,
+<span class="fc" id="L85">            BeanPropertyRowMapper.newInstance(PetType.class));</span>
+	}
+
+	@Override
+	public void save(PetType petType) throws DataAccessException {
+<span class="fc" id="L90">		BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(petType);</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">		if (petType.isNew()) {</span>
+<span class="fc" id="L92">            Number newKey = this.insertPetType.executeAndReturnKey(parameterSource);</span>
+<span class="fc" id="L93">            petType.setId(newKey.intValue());</span>
+<span class="fc" id="L94">        } else {</span>
+<span class="fc" id="L95">            this.namedParameterJdbcTemplate.update(&quot;UPDATE types SET name=:name WHERE id=:id&quot;,</span>
+                parameterSource);
+        }
+<span class="fc" id="L98">	}</span>
+
+	@Override
+	public void delete(PetType petType) throws DataAccessException {
+<span class="fc" id="L102">		Map&lt;String, Object&gt; pettype_params = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L103">		pettype_params.put(&quot;id&quot;, petType.getId());</span>
+<span class="fc" id="L104">		List&lt;Pet&gt; pets = new ArrayList&lt;Pet&gt;();</span>
+<span class="fc" id="L105">		pets = this.namedParameterJdbcTemplate.</span>
+<span class="fc" id="L106">    			query(&quot;SELECT pets.id, name, birth_date, type_id, owner_id FROM pets WHERE type_id=:id&quot;,</span>
+    			pettype_params,
+<span class="fc" id="L108">    			BeanPropertyRowMapper.newInstance(Pet.class));</span>
+		// cascade delete pets
+<span class="fc bfc" id="L110" title="All 2 branches covered.">		for (Pet pet : pets){</span>
+<span class="fc" id="L111">			Map&lt;String, Object&gt; pet_params = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L112">			pet_params.put(&quot;id&quot;, pet.getId());</span>
+<span class="fc" id="L113">			List&lt;Visit&gt; visits = new ArrayList&lt;Visit&gt;();</span>
+<span class="fc" id="L114">			visits = this.namedParameterJdbcTemplate.query(</span>
+		            &quot;SELECT id, pet_id, visit_date, description FROM visits WHERE pet_id = :id&quot;,
+		            pet_params,
+<span class="fc" id="L117">		            BeanPropertyRowMapper.newInstance(Visit.class));</span>
+	        // cascade delete visits
+<span class="fc bfc" id="L119" title="All 2 branches covered.">	        for (Visit visit : visits){</span>
+<span class="fc" id="L120">	        	Map&lt;String, Object&gt; visit_params = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L121">	        	visit_params.put(&quot;id&quot;, visit.getId());</span>
+<span class="fc" id="L122">	        	this.namedParameterJdbcTemplate.update(&quot;DELETE FROM visits WHERE id=:id&quot;, visit_params);</span>
+<span class="fc" id="L123">	        }</span>
+<span class="fc" id="L124">	        this.namedParameterJdbcTemplate.update(&quot;DELETE FROM pets WHERE id=:id&quot;, pet_params);</span>
+<span class="fc" id="L125">        }</span>
+<span class="fc" id="L126">        this.namedParameterJdbcTemplate.update(&quot;DELETE FROM types WHERE id=:id&quot;, pettype_params);</span>
+<span class="fc" id="L127">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

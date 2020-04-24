@@ -1,0 +1,29 @@
+- name: Install docker
+  become: true
+  shell: curl https://get.docker.com | sh
+
+- name: Install pip
+  become: true
+  shell: sudo apt-get install python-pip -y
+
+- name: Change privilege of docker
+  become: true
+  file: dest=/usr/bin/docker mode=+x
+
+- name: python docker / docker-compse module
+  pip:
+    name:
+        - docker
+
+- name: enable docker service
+  become: true
+  service:
+    name: docker
+    enabled: yes
+
+
+- name: Start service
+  become: true
+  service:
+    name: docker
+    state: started

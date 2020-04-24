@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClinicServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-petclinic-rest</a> &gt; <a href="index.source.html" class="el_package">org.springframework.samples.petclinic.service</a> &gt; <span class="el_source">ClinicServiceImpl.java</span></div><h1>ClinicServiceImpl.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2002-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.service;
+
+import java.util.Collection;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.orm.ObjectRetrievalFailureException;
+import org.springframework.samples.petclinic.model.Owner;
+import org.springframework.samples.petclinic.model.Pet;
+import org.springframework.samples.petclinic.model.PetType;
+import org.springframework.samples.petclinic.model.Specialty;
+import org.springframework.samples.petclinic.model.Vet;
+import org.springframework.samples.petclinic.model.Visit;
+import org.springframework.samples.petclinic.repository.OwnerRepository;
+import org.springframework.samples.petclinic.repository.PetRepository;
+import org.springframework.samples.petclinic.repository.PetTypeRepository;
+import org.springframework.samples.petclinic.repository.SpecialtyRepository;
+import org.springframework.samples.petclinic.repository.VetRepository;
+import org.springframework.samples.petclinic.repository.VisitRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Mostly used as a facade for all Petclinic controllers
+ * Also a placeholder for @Transactional and @Cacheable annotations
+ *
+ * @author Michael Isvy
+ * @author Vitaliy Fedoriv
+ */
+@Service
+
+public class ClinicServiceImpl implements ClinicService {
+
+    private PetRepository petRepository;
+    private VetRepository vetRepository;
+    private OwnerRepository ownerRepository;
+    private VisitRepository visitRepository;
+    private SpecialtyRepository specialtyRepository;
+	private PetTypeRepository petTypeRepository;
+
+    @Autowired
+     public ClinicServiceImpl(
+       		 PetRepository petRepository,
+    		 VetRepository vetRepository,
+    		 OwnerRepository ownerRepository,
+    		 VisitRepository visitRepository,
+    		 SpecialtyRepository specialtyRepository,
+<span class="fc" id="L65">			 PetTypeRepository petTypeRepository) {</span>
+<span class="fc" id="L66">        this.petRepository = petRepository;</span>
+<span class="fc" id="L67">        this.vetRepository = vetRepository;</span>
+<span class="fc" id="L68">        this.ownerRepository = ownerRepository;</span>
+<span class="fc" id="L69">        this.visitRepository = visitRepository;</span>
+<span class="fc" id="L70">        this.specialtyRepository = specialtyRepository; </span>
+<span class="fc" id="L71">		this.petTypeRepository = petTypeRepository;</span>
+<span class="fc" id="L72">    }</span>
+
+	@Override
+	@Transactional(readOnly = true)
+	public Collection&lt;Pet&gt; findAllPets() throws DataAccessException {
+<span class="fc" id="L77">		return petRepository.findAll();</span>
+	}
+
+	@Override
+	@Transactional
+	public void deletePet(Pet pet) throws DataAccessException {
+<span class="fc" id="L83">		petRepository.delete(pet);</span>
+<span class="fc" id="L84">	}</span>
+
+	@Override
+	@Transactional(readOnly = true)
+	public Visit findVisitById(int visitId) throws DataAccessException {
+<span class="fc" id="L89">		Visit visit = null;</span>
+		try {
+<span class="fc" id="L91">			visit = visitRepository.findById(visitId);</span>
+<span class="fc" id="L92">		} catch (ObjectRetrievalFailureException|EmptyResultDataAccessException e) {</span>
+		// just ignore not found exceptions for Jdbc/Jpa realization
+<span class="fc" id="L94">			return null;</span>
+<span class="fc" id="L95">		}</span>
+<span class="fc" id="L96">		return visit;</span>
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Collection&lt;Visit&gt; findAllVisits() throws DataAccessException {
+<span class="fc" id="L102">		return visitRepository.findAll();</span>
+	}
+
+	@Override
+	@Transactional
+	public void deleteVisit(Visit visit) throws DataAccessException {
+<span class="fc" id="L108">		visitRepository.delete(visit);</span>
+<span class="fc" id="L109">	}</span>
+
+	@Override
+	@Transactional(readOnly = true)
+	public Vet findVetById(int id) throws DataAccessException {
+<span class="fc" id="L114">		Vet vet = null;</span>
+		try {
+<span class="fc" id="L116">			vet = vetRepository.findById(id);</span>
+<span class="fc" id="L117">		} catch (ObjectRetrievalFailureException|EmptyResultDataAccessException e) {</span>
+		// just ignore not found exceptions for Jdbc/Jpa realization
+<span class="fc" id="L119">			return null;</span>
+<span class="fc" id="L120">		}</span>
+<span class="fc" id="L121">		return vet;</span>
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Collection&lt;Vet&gt; findAllVets() throws DataAccessException {
+<span class="fc" id="L127">		return vetRepository.findAll();</span>
+	}
+
+	@Override
+	@Transactional
+	public void saveVet(Vet vet) throws DataAccessException {
+<span class="fc" id="L133">		vetRepository.save(vet);</span>
+<span class="fc" id="L134">	}</span>
+
+	@Override
+	@Transactional
+	public void deleteVet(Vet vet) throws DataAccessException {
+<span class="fc" id="L139">		vetRepository.delete(vet);</span>
+<span class="fc" id="L140">	}</span>
+
+	@Override
+	@Transactional(readOnly = true)
+	public Collection&lt;Owner&gt; findAllOwners() throws DataAccessException {
+<span class="fc" id="L145">		return ownerRepository.findAll();</span>
+	}
+
+	@Override
+	@Transactional
+	public void deleteOwner(Owner owner) throws DataAccessException {
+<span class="fc" id="L151">		ownerRepository.delete(owner);</span>
+<span class="fc" id="L152">	}</span>
+
+	@Override
+	@Transactional(readOnly = true)
+	public PetType findPetTypeById(int petTypeId) {
+<span class="fc" id="L157">		PetType petType = null;</span>
+		try {
+<span class="fc" id="L159">			petType = petTypeRepository.findById(petTypeId);</span>
+<span class="fc" id="L160">		} catch (ObjectRetrievalFailureException|EmptyResultDataAccessException e) {</span>
+		// just ignore not found exceptions for Jdbc/Jpa realization
+<span class="fc" id="L162">			return null;</span>
+<span class="fc" id="L163">		}</span>
+<span class="fc" id="L164">		return petType;</span>
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Collection&lt;PetType&gt; findAllPetTypes() throws DataAccessException {
+<span class="fc" id="L170">		return petTypeRepository.findAll();</span>
+	}
+
+	@Override
+	@Transactional
+	public void savePetType(PetType petType) throws DataAccessException {
+<span class="fc" id="L176">		petTypeRepository.save(petType);</span>
+<span class="fc" id="L177">	}</span>
+
+	@Override
+	@Transactional
+	public void deletePetType(PetType petType) throws DataAccessException {
+<span class="fc" id="L182">		petTypeRepository.delete(petType);</span>
+<span class="fc" id="L183">	}</span>
+
+	@Override
+	@Transactional(readOnly = true)
+	public Specialty findSpecialtyById(int specialtyId) {
+<span class="fc" id="L188">		Specialty specialty = null;</span>
+		try {
+<span class="fc" id="L190">			specialty = specialtyRepository.findById(specialtyId);</span>
+<span class="fc" id="L191">		} catch (ObjectRetrievalFailureException|EmptyResultDataAccessException e) {</span>
+		// just ignore not found exceptions for Jdbc/Jpa realization
+<span class="fc" id="L193">			return null;</span>
+<span class="fc" id="L194">		}</span>
+<span class="fc" id="L195">		return specialty;</span>
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Collection&lt;Specialty&gt; findAllSpecialties() throws DataAccessException {
+<span class="fc" id="L201">		return specialtyRepository.findAll();</span>
+	}
+
+	@Override
+	@Transactional
+	public void saveSpecialty(Specialty specialty) throws DataAccessException {
+<span class="fc" id="L207">		specialtyRepository.save(specialty);</span>
+<span class="fc" id="L208">	}</span>
+
+	@Override
+	@Transactional
+	public void deleteSpecialty(Specialty specialty) throws DataAccessException {
+<span class="fc" id="L213">		specialtyRepository.delete(specialty);</span>
+<span class="fc" id="L214">	}</span>
+
+	@Override
+	@Transactional(readOnly = true)
+	public Collection&lt;PetType&gt; findPetTypes() throws DataAccessException {
+<span class="fc" id="L219">		return petRepository.findPetTypes();</span>
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Owner findOwnerById(int id) throws DataAccessException {
+<span class="fc" id="L225">		Owner owner = null;</span>
+		try {
+<span class="fc" id="L227">			owner = ownerRepository.findById(id);</span>
+<span class="fc" id="L228">		} catch (ObjectRetrievalFailureException|EmptyResultDataAccessException e) {</span>
+		// just ignore not found exceptions for Jdbc/Jpa realization
+<span class="fc" id="L230">			return null;</span>
+<span class="fc" id="L231">		}</span>
+<span class="fc" id="L232">		return owner;</span>
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Pet findPetById(int id) throws DataAccessException {
+<span class="fc" id="L238">		Pet pet = null;</span>
+		try {
+<span class="fc" id="L240">			pet = petRepository.findById(id);</span>
+<span class="fc" id="L241">		} catch (ObjectRetrievalFailureException|EmptyResultDataAccessException e) {</span>
+		// just ignore not found exceptions for Jdbc/Jpa realization
+<span class="fc" id="L243">			return null;</span>
+<span class="fc" id="L244">		}</span>
+<span class="fc" id="L245">		return pet;</span>
+	}
+
+	@Override
+	@Transactional
+	public void savePet(Pet pet) throws DataAccessException {
+<span class="fc" id="L251">		petRepository.save(pet);</span>
+		
+<span class="fc" id="L253">	}</span>
+
+	@Override
+	@Transactional
+	public void saveVisit(Visit visit) throws DataAccessException {
+<span class="fc" id="L258">		visitRepository.save(visit);</span>
+		
+<span class="fc" id="L260">	}</span>
+
+	@Override
+	@Transactional(readOnly = true)
+    @Cacheable(value = &quot;vets&quot;)
+	public Collection&lt;Vet&gt; findVets() throws DataAccessException {
+<span class="fc" id="L266">		return vetRepository.findAll();</span>
+	}
+
+	@Override
+	@Transactional
+	public void saveOwner(Owner owner) throws DataAccessException {
+<span class="fc" id="L272">		ownerRepository.save(owner);</span>
+		
+<span class="fc" id="L274">	}</span>
+
+	@Override
+	@Transactional(readOnly = true)
+	public Collection&lt;Owner&gt; findOwnerByLastName(String lastName) throws DataAccessException {
+<span class="fc" id="L279">		return ownerRepository.findByLastName(lastName);</span>
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Collection&lt;Visit&gt; findVisitsByPetId(int petId) {
+<span class="fc" id="L285">		return visitRepository.findByPetId(petId);</span>
+	}
+	
+	
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

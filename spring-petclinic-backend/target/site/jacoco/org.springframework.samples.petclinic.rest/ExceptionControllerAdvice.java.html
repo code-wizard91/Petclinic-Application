@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExceptionControllerAdvice.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-petclinic-rest</a> &gt; <a href="index.source.html" class="el_package">org.springframework.samples.petclinic.rest</a> &gt; <span class="el_source">ExceptionControllerAdvice.java</span></div><h1>ExceptionControllerAdvice.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2016 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.rest;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+/**
+ * @author Vitaliy Fedoriv
+ *
+ */
+
+@ControllerAdvice
+<span class="fc" id="L32">public class ExceptionControllerAdvice {</span>
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity&lt;String&gt; exception(Exception e) {
+<span class="fc" id="L36">		ObjectMapper mapper = new ObjectMapper();</span>
+<span class="fc" id="L37">		ErrorInfo errorInfo = new ErrorInfo(e);</span>
+<span class="fc" id="L38">		String respJSONstring = &quot;{}&quot;;</span>
+		try {
+<span class="fc" id="L40">			respJSONstring = mapper.writeValueAsString(errorInfo);</span>
+<span class="nc" id="L41">		} catch (JsonProcessingException e1) {</span>
+<span class="nc" id="L42">			e1.printStackTrace();</span>
+<span class="fc" id="L43">		}</span>
+<span class="fc" id="L44">		return ResponseEntity.badRequest().body(respJSONstring);</span>
+	}
+	
+	private class ErrorInfo {
+	    public final String className;
+	    public final String exMessage;
+
+<span class="fc" id="L51">	    public ErrorInfo(Exception ex) {</span>
+<span class="fc" id="L52">	        this.className = ex.getClass().getName();</span>
+<span class="fc" id="L53">	        this.exMessage = ex.getLocalizedMessage();</span>
+<span class="fc" id="L54">	    }</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

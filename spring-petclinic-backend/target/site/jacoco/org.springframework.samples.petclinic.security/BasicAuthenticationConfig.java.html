@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BasicAuthenticationConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-petclinic-rest</a> &gt; <a href="index.source.html" class="el_package">org.springframework.samples.petclinic.security</a> &gt; <span class="el_source">BasicAuthenticationConfig.java</span></div><h1>BasicAuthenticationConfig.java</h1><pre class="source lang-java linenums">package org.springframework.samples.petclinic.security;
+
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true) // Enable @PreAuthorize method-level security
+@ConditionalOnProperty(name = &quot;petclinic.security.enable&quot;, havingValue = &quot;true&quot;)
+<span class="nc" id="L20">public class BasicAuthenticationConfig extends WebSecurityConfigurerAdapter {</span>
+
+    @Autowired
+    private DataSource dataSource;
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        // @formatter:off
+<span class="nc" id="L28">        http</span>
+<span class="nc" id="L29">            .authorizeRequests()</span>
+<span class="nc" id="L30">                .anyRequest()</span>
+<span class="nc" id="L31">                    .authenticated()</span>
+<span class="nc" id="L32">                    .and()</span>
+<span class="nc" id="L33">                .httpBasic()</span>
+<span class="nc" id="L34">                    .and()</span>
+<span class="nc" id="L35">                .csrf()</span>
+<span class="nc" id="L36">                    .disable();</span>
+        // @formatter:on
+<span class="nc" id="L38">    }</span>
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        // @formatter:off
+<span class="nc" id="L43">        auth</span>
+<span class="nc" id="L44">            .jdbcAuthentication()</span>
+<span class="nc" id="L45">                .dataSource(dataSource)</span>
+<span class="nc" id="L46">                .usersByUsernameQuery(&quot;select username,password,enabled from users where username=?&quot;)</span>
+<span class="nc" id="L47">                .authoritiesByUsernameQuery(&quot;select username,role from roles where username=?&quot;);</span>
+        // @formatter:on
+<span class="nc" id="L49">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

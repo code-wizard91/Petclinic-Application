@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: org.springframework.samples.petclinic.rest.UserRestControllerTests
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.143 s - in org.springframework.samples.petclinic.rest.UserRestControllerTests

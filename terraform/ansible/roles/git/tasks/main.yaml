@@ -1,0 +1,7 @@
+- name: install git
+  become: true
+  shell: sudo apt install git
+
+- name: installing java
+  become: true
+  shell: sudo apt install openjdk-8-jdk -y

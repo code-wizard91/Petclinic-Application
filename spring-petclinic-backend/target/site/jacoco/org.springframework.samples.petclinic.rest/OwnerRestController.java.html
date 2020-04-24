@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OwnerRestController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-petclinic-rest</a> &gt; <a href="index.source.html" class="el_package">org.springframework.samples.petclinic.rest</a> &gt; <span class="el_source">OwnerRestController.java</span></div><h1>OwnerRestController.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.rest;
+
+import java.util.Collection;
+
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.samples.petclinic.model.Owner;
+import org.springframework.samples.petclinic.service.ClinicService;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
+
+/**
+ * @author Vitaliy Fedoriv
+ *
+ */
+
+@RestController
+@CrossOrigin(exposedHeaders = &quot;errors, content-type&quot;)
+@RequestMapping(&quot;/api/owners&quot;)
+<span class="fc" id="L49">public class OwnerRestController {</span>
+
+	@Autowired
+	private ClinicService clinicService;
+
+	@PreAuthorize( &quot;hasRole(@roles.OWNER_ADMIN)&quot; )
+	@RequestMapping(value = &quot;/*/lastname/{lastName}&quot;, method = RequestMethod.GET, produces = &quot;application/json&quot;)
+	public ResponseEntity&lt;Collection&lt;Owner&gt;&gt; getOwnersList(@PathVariable(&quot;lastName&quot;) String ownerLastName) {
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">		if (ownerLastName == null) {</span>
+<span class="nc" id="L58">			ownerLastName = &quot;&quot;;</span>
+		}
+<span class="fc" id="L60">		Collection&lt;Owner&gt; owners = this.clinicService.findOwnerByLastName(ownerLastName);</span>
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">		if (owners.isEmpty()) {</span>
+<span class="nc" id="L62">			return new ResponseEntity&lt;Collection&lt;Owner&gt;&gt;(HttpStatus.NOT_FOUND);</span>
+		}
+<span class="fc" id="L64">		return new ResponseEntity&lt;Collection&lt;Owner&gt;&gt;(owners, HttpStatus.OK);</span>
+	}
+
+    @PreAuthorize( &quot;hasRole(@roles.OWNER_ADMIN)&quot; )
+	@RequestMapping(value = &quot;&quot;, method = RequestMethod.GET, produces = &quot;application/json&quot;)
+	public ResponseEntity&lt;Collection&lt;Owner&gt;&gt; getOwners() {
+<span class="fc" id="L70">		Collection&lt;Owner&gt; owners = this.clinicService.findAllOwners();</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">		if (owners.isEmpty()) {</span>
+<span class="fc" id="L72">			return new ResponseEntity&lt;Collection&lt;Owner&gt;&gt;(HttpStatus.NOT_FOUND);</span>
+		}
+<span class="fc" id="L74">		return new ResponseEntity&lt;Collection&lt;Owner&gt;&gt;(owners, HttpStatus.OK);</span>
+	}
+
+    @PreAuthorize( &quot;hasRole(@roles.OWNER_ADMIN)&quot; )
+	@RequestMapping(value = &quot;/{ownerId}&quot;, method = RequestMethod.GET, produces = &quot;application/json&quot;)
+	public ResponseEntity&lt;Owner&gt; getOwner(@PathVariable(&quot;ownerId&quot;) int ownerId) {
+<span class="fc" id="L80">		Owner owner = null;</span>
+<span class="fc" id="L81">		owner = this.clinicService.findOwnerById(ownerId);</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">		if (owner == null) {</span>
+<span class="fc" id="L83">			return new ResponseEntity&lt;Owner&gt;(HttpStatus.NOT_FOUND);</span>
+		}
+<span class="fc" id="L85">		return new ResponseEntity&lt;Owner&gt;(owner, HttpStatus.OK);</span>
+	}
+
+    @PreAuthorize( &quot;hasRole(@roles.OWNER_ADMIN)&quot; )
+	@RequestMapping(value = &quot;&quot;, method = RequestMethod.POST, produces = &quot;application/json&quot;)
+	public ResponseEntity&lt;Owner&gt; addOwner(@RequestBody @Valid Owner owner, BindingResult bindingResult,
+			UriComponentsBuilder ucBuilder) {
+<span class="fc" id="L92">		HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc bfc" id="L93" title="All 4 branches covered.">		if (bindingResult.hasErrors() || owner.getId() != null) {</span>
+<span class="fc" id="L94">            BindingErrorsResponse errors = new BindingErrorsResponse(owner.getId());</span>
+<span class="fc" id="L95">			errors.addAllErrors(bindingResult);</span>
+<span class="fc" id="L96">			headers.add(&quot;errors&quot;, errors.toJSON());</span>
+<span class="fc" id="L97">			return new ResponseEntity&lt;Owner&gt;(headers, HttpStatus.BAD_REQUEST);</span>
+		}
+<span class="fc" id="L99">		this.clinicService.saveOwner(owner);</span>
+<span class="fc" id="L100">		headers.setLocation(ucBuilder.path(&quot;/api/owners/{id}&quot;).buildAndExpand(owner.getId()).toUri());</span>
+<span class="fc" id="L101">		return new ResponseEntity&lt;Owner&gt;(owner, headers, HttpStatus.CREATED);</span>
+	}
+
+    @PreAuthorize( &quot;hasRole(@roles.OWNER_ADMIN)&quot; )
+	@RequestMapping(value = &quot;/{ownerId}&quot;, method = RequestMethod.PUT, produces = &quot;application/json&quot;)
+	public ResponseEntity&lt;Owner&gt; updateOwner(@PathVariable(&quot;ownerId&quot;) int ownerId, @RequestBody @Valid Owner owner,
+			BindingResult bindingResult, UriComponentsBuilder ucBuilder) {
+<span class="fc bfc" id="L108" title="All 4 branches covered.">	    boolean bodyIdMatchesPathId = owner.getId() == null || ownerId == owner.getId();</span>
+<span class="fc bfc" id="L109" title="All 4 branches covered.">		if (bindingResult.hasErrors() || !bodyIdMatchesPathId) {</span>
+<span class="fc" id="L110">            BindingErrorsResponse errors = new BindingErrorsResponse(ownerId, owner.getId());</span>
+<span class="fc" id="L111">			errors.addAllErrors(bindingResult);</span>
+<span class="fc" id="L112">            HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L113">			headers.add(&quot;errors&quot;, errors.toJSON());</span>
+<span class="fc" id="L114">			return new ResponseEntity&lt;Owner&gt;(headers, HttpStatus.BAD_REQUEST);</span>
+		}
+<span class="fc" id="L116">		Owner currentOwner = this.clinicService.findOwnerById(ownerId);</span>
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">		if (currentOwner == null) {</span>
+<span class="nc" id="L118">			return new ResponseEntity&lt;Owner&gt;(HttpStatus.NOT_FOUND);</span>
+		}
+<span class="fc" id="L120">		currentOwner.setAddress(owner.getAddress());</span>
+<span class="fc" id="L121">		currentOwner.setCity(owner.getCity());</span>
+<span class="fc" id="L122">		currentOwner.setFirstName(owner.getFirstName());</span>
+<span class="fc" id="L123">		currentOwner.setLastName(owner.getLastName());</span>
+<span class="fc" id="L124">		currentOwner.setTelephone(owner.getTelephone());</span>
+<span class="fc" id="L125">		this.clinicService.saveOwner(currentOwner);</span>
+<span class="fc" id="L126">		return new ResponseEntity&lt;Owner&gt;(currentOwner, HttpStatus.NO_CONTENT);</span>
+	}
+
+    @PreAuthorize( &quot;hasRole(@roles.OWNER_ADMIN)&quot; )
+	@RequestMapping(value = &quot;/{ownerId}&quot;, method = RequestMethod.DELETE, produces = &quot;application/json&quot;)
+	@Transactional
+	public ResponseEntity&lt;Void&gt; deleteOwner(@PathVariable(&quot;ownerId&quot;) int ownerId) {
+<span class="fc" id="L133">		Owner owner = this.clinicService.findOwnerById(ownerId);</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">		if (owner == null) {</span>
+<span class="fc" id="L135">			return new ResponseEntity&lt;Void&gt;(HttpStatus.NOT_FOUND);</span>
+		}
+<span class="fc" id="L137">		this.clinicService.deleteOwner(owner);</span>
+<span class="fc" id="L138">		return new ResponseEntity&lt;Void&gt;(HttpStatus.NO_CONTENT);</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,15 @@
+[jenkins]
+52.251.60.83
+ 
+[jenkins:vars]
+ansible_user=mizan
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+ansible_ssh_private_key_file=~/.ssh/id_rsa
+ 
+[kubecontrol]
+13.68.239.139
+ 
+[kubecontrol:vars]
+ansible_user=mizan
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+ansible_ssh_private_key_file=~/.ssh/id_rsa

@@ -1,0 +1,23 @@
+version: "3.3"
+
+services:
+
+  nginx:
+    image: docktermo/nginx
+    ports:
+      - 80:80
+    container_name: nginx
+    
+  backend:
+    image: alimizan/petclinic-backend:latest
+    ports:
+      - 9966:9966
+    container_name: backend
+
+  frontend:
+    image: docktermo/frontend
+    depends_on:
+      - backend
+    ports:
+      - 4200:4200
+    container_name: frontend

@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: backend
+  ports:
+  - protocol: TCP
+    port: 9966
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      hostname: backend
+      containers:
+      - name: backend
+        image: alimizan/petclinic-backend:latest
+        ports:
+        - containerPort: 9966

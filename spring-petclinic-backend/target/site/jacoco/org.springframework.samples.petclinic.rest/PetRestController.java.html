@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PetRestController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-petclinic-rest</a> &gt; <a href="index.source.html" class="el_package">org.springframework.samples.petclinic.rest</a> &gt; <span class="el_source">PetRestController.java</span></div><h1>PetRestController.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.rest;
+
+import java.util.Collection;
+
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.samples.petclinic.model.Pet;
+import org.springframework.samples.petclinic.model.PetType;
+import org.springframework.samples.petclinic.service.ClinicService;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
+
+/**
+ * @author Vitaliy Fedoriv
+ *
+ */
+
+@RestController
+@CrossOrigin(exposedHeaders = &quot;errors, content-type&quot;)
+@RequestMapping(&quot;api/pets&quot;)
+<span class="fc" id="L50">public class PetRestController {</span>
+
+	@Autowired
+	private ClinicService clinicService;
+
+    @PreAuthorize( &quot;hasRole(@roles.OWNER_ADMIN)&quot; )
+	@RequestMapping(value = &quot;/{petId}&quot;, method = RequestMethod.GET, produces = &quot;application/json&quot;)
+	public ResponseEntity&lt;Pet&gt; getPet(@PathVariable(&quot;petId&quot;) int petId){
+<span class="fc" id="L58">		Pet pet = this.clinicService.findPetById(petId);</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">		if(pet == null){</span>
+<span class="fc" id="L60">			return new ResponseEntity&lt;Pet&gt;(HttpStatus.NOT_FOUND);</span>
+		}
+<span class="fc" id="L62">		return new ResponseEntity&lt;Pet&gt;(pet, HttpStatus.OK);</span>
+	}
+
+    @PreAuthorize( &quot;hasRole(@roles.OWNER_ADMIN)&quot; )
+	@RequestMapping(value = &quot;&quot;, method = RequestMethod.GET, produces = &quot;application/json&quot;)
+	public ResponseEntity&lt;Collection&lt;Pet&gt;&gt; getPets(){
+<span class="fc" id="L68">		Collection&lt;Pet&gt; pets = this.clinicService.findAllPets();</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">		if(pets.isEmpty()){</span>
+<span class="fc" id="L70">			return new ResponseEntity&lt;Collection&lt;Pet&gt;&gt;(HttpStatus.NOT_FOUND);</span>
+		}
+<span class="fc" id="L72">		return new ResponseEntity&lt;Collection&lt;Pet&gt;&gt;(pets, HttpStatus.OK);</span>
+	}
+
+    @PreAuthorize( &quot;hasRole(@roles.OWNER_ADMIN)&quot; )
+	@RequestMapping(value = &quot;/pettypes&quot;, method = RequestMethod.GET, produces = &quot;application/json&quot;)
+	public ResponseEntity&lt;Collection&lt;PetType&gt;&gt; getPetTypes(){
+<span class="nc" id="L78">		return new ResponseEntity&lt;Collection&lt;PetType&gt;&gt;(this.clinicService.findPetTypes(), HttpStatus.OK);</span>
+	}
+
+    @PreAuthorize( &quot;hasRole(@roles.OWNER_ADMIN)&quot; )
+	@RequestMapping(value = &quot;&quot;, method = RequestMethod.POST, produces = &quot;application/json&quot;)
+	public ResponseEntity&lt;Pet&gt; addPet(@RequestBody @Valid Pet pet, BindingResult bindingResult, UriComponentsBuilder ucBuilder){
+<span class="fc" id="L84">		BindingErrorsResponse errors = new BindingErrorsResponse();</span>
+<span class="fc" id="L85">		HttpHeaders headers = new HttpHeaders();</span>
+<span class="pc bpc" id="L86" title="1 of 4 branches missed.">		if(bindingResult.hasErrors() || (pet == null)){</span>
+<span class="nc" id="L87">			errors.addAllErrors(bindingResult);</span>
+<span class="nc" id="L88">			headers.add(&quot;errors&quot;, errors.toJSON());</span>
+<span class="nc" id="L89">			return new ResponseEntity&lt;Pet&gt;(headers, HttpStatus.BAD_REQUEST);</span>
+		}
+<span class="fc" id="L91">		this.clinicService.savePet(pet);</span>
+<span class="fc" id="L92">		headers.setLocation(ucBuilder.path(&quot;/api/pets/{id}&quot;).buildAndExpand(pet.getId()).toUri());</span>
+<span class="fc" id="L93">		return new ResponseEntity&lt;Pet&gt;(pet, headers, HttpStatus.CREATED);</span>
+	}
+
+    @PreAuthorize( &quot;hasRole(@roles.OWNER_ADMIN)&quot; )
+	@RequestMapping(value = &quot;/{petId}&quot;, method = RequestMethod.PUT, produces = &quot;application/json&quot;)
+	public ResponseEntity&lt;Pet&gt; updatePet(@PathVariable(&quot;petId&quot;) int petId, @RequestBody @Valid Pet pet, BindingResult bindingResult){
+<span class="fc" id="L99">		BindingErrorsResponse errors = new BindingErrorsResponse();</span>
+<span class="fc" id="L100">		HttpHeaders headers = new HttpHeaders();</span>
+<span class="pc bpc" id="L101" title="1 of 4 branches missed.">		if(bindingResult.hasErrors() || (pet == null)){</span>
+<span class="fc" id="L102">			errors.addAllErrors(bindingResult);</span>
+<span class="fc" id="L103">			headers.add(&quot;errors&quot;, errors.toJSON());</span>
+<span class="fc" id="L104">			return new ResponseEntity&lt;Pet&gt;(headers, HttpStatus.BAD_REQUEST);</span>
+		}
+<span class="fc" id="L106">		Pet currentPet = this.clinicService.findPetById(petId);</span>
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">		if(currentPet == null){</span>
+<span class="nc" id="L108">			return new ResponseEntity&lt;Pet&gt;(HttpStatus.NOT_FOUND);</span>
+		}
+<span class="fc" id="L110">		currentPet.setBirthDate(pet.getBirthDate());</span>
+<span class="fc" id="L111">		currentPet.setName(pet.getName());</span>
+<span class="fc" id="L112">		currentPet.setType(pet.getType());</span>
+<span class="fc" id="L113">		currentPet.setOwner(pet.getOwner());</span>
+<span class="fc" id="L114">		this.clinicService.savePet(currentPet);</span>
+<span class="fc" id="L115">		return new ResponseEntity&lt;Pet&gt;(currentPet, HttpStatus.NO_CONTENT);</span>
+	}
+
+    @PreAuthorize( &quot;hasRole(@roles.OWNER_ADMIN)&quot; )
+	@RequestMapping(value = &quot;/{petId}&quot;, method = RequestMethod.DELETE, produces = &quot;application/json&quot;)
+	@Transactional
+	public ResponseEntity&lt;Void&gt; deletePet(@PathVariable(&quot;petId&quot;) int petId){
+<span class="fc" id="L122">		Pet pet = this.clinicService.findPetById(petId);</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">		if(pet == null){</span>
+<span class="fc" id="L124">			return new ResponseEntity&lt;Void&gt;(HttpStatus.NOT_FOUND);</span>
+		}
+<span class="fc" id="L126">		this.clinicService.deletePet(pet);</span>
+<span class="fc" id="L127">		return new ResponseEntity&lt;Void&gt;(HttpStatus.NO_CONTENT);</span>
+	}
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

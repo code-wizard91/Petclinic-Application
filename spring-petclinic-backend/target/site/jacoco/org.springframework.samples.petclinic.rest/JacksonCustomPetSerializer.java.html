@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JacksonCustomPetSerializer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-petclinic-rest</a> &gt; <a href="index.source.html" class="el_package">org.springframework.samples.petclinic.rest</a> &gt; <span class="el_source">JacksonCustomPetSerializer.java</span></div><h1>JacksonCustomPetSerializer.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2016 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.rest;
+
+import java.io.IOException;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+
+import org.springframework.samples.petclinic.model.Owner;
+import org.springframework.samples.petclinic.model.Pet;
+import org.springframework.samples.petclinic.model.PetType;
+import org.springframework.samples.petclinic.model.Visit;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+
+/**
+ * @author Vitaliy Fedoriv
+ *
+ */
+
+public class JacksonCustomPetSerializer extends StdSerializer&lt;Pet&gt; {
+
+	public JacksonCustomPetSerializer() {
+<span class="fc" id="L40">		this(null);</span>
+<span class="fc" id="L41">	}</span>
+
+	protected JacksonCustomPetSerializer(Class&lt;Pet&gt; t) {
+<span class="fc" id="L44">		super(t);</span>
+<span class="fc" id="L45">	}</span>
+
+	@Override
+	public void serialize(Pet pet, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+<span class="fc" id="L49">		Format formatter = new SimpleDateFormat(&quot;yyyy/MM/dd&quot;);</span>
+<span class="fc" id="L50">		jgen.writeStartObject(); // pet</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">		if (pet.getId() == null) {</span>
+<span class="fc" id="L52">			jgen.writeNullField(&quot;id&quot;);</span>
+		} else {
+<span class="fc" id="L54">			jgen.writeNumberField(&quot;id&quot;, pet.getId());</span>
+		}
+<span class="fc" id="L56">		jgen.writeStringField(&quot;name&quot;, pet.getName());</span>
+<span class="fc" id="L57">		jgen.writeStringField(&quot;birthDate&quot;, formatter.format(pet.getBirthDate()));</span>
+
+<span class="fc" id="L59">		PetType petType = pet.getType();</span>
+<span class="fc" id="L60">		jgen.writeObjectFieldStart(&quot;type&quot;);</span>
+<span class="fc" id="L61">		jgen.writeNumberField(&quot;id&quot;, petType.getId());</span>
+<span class="fc" id="L62">		jgen.writeStringField(&quot;name&quot;, petType.getName());</span>
+<span class="fc" id="L63">		jgen.writeEndObject(); // type</span>
+
+<span class="fc" id="L65">		Owner owner = pet.getOwner();</span>
+<span class="fc" id="L66">		jgen.writeObjectFieldStart(&quot;owner&quot;);</span>
+<span class="fc" id="L67">		jgen.writeNumberField(&quot;id&quot;, owner.getId());</span>
+<span class="fc" id="L68">		jgen.writeStringField(&quot;firstName&quot;, owner.getFirstName());</span>
+<span class="fc" id="L69">		jgen.writeStringField(&quot;lastName&quot;, owner.getLastName());</span>
+<span class="fc" id="L70">		jgen.writeStringField(&quot;address&quot;, owner.getAddress());</span>
+<span class="fc" id="L71">		jgen.writeStringField(&quot;city&quot;, owner.getCity());</span>
+<span class="fc" id="L72">		jgen.writeStringField(&quot;telephone&quot;, owner.getTelephone());</span>
+<span class="fc" id="L73">		jgen.writeEndObject(); // owner</span>
+		// write visits array
+<span class="fc" id="L75">		jgen.writeArrayFieldStart(&quot;visits&quot;);</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">		for (Visit visit : pet.getVisits()) {</span>
+<span class="nc" id="L77">			jgen.writeStartObject(); // visit</span>
+<span class="nc" id="L78">			jgen.writeNumberField(&quot;id&quot;, visit.getId());</span>
+<span class="nc" id="L79">			jgen.writeStringField(&quot;date&quot;, formatter.format(visit.getDate()));</span>
+<span class="nc" id="L80">			jgen.writeStringField(&quot;description&quot;, visit.getDescription());</span>
+<span class="nc" id="L81">			jgen.writeNumberField(&quot;pet&quot;, visit.getPet().getId());</span>
+<span class="nc" id="L82">			jgen.writeEndObject(); // visit</span>
+<span class="nc" id="L83">		}</span>
+<span class="fc" id="L84">		jgen.writeEndArray(); // visits</span>
+<span class="fc" id="L85">		jgen.writeEndObject(); // pet</span>
+<span class="fc" id="L86">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

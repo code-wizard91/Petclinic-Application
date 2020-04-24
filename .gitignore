@@ -1,0 +1,10 @@
+terraform/cluster-controller/.terraform/
+terraform/jenkins/.terraform/
+terraform/kubernetes-cluster/.terraform/
+terraform/kubernetes-cluster/terraform.tfstate
+terraform/kubernetes-cluster/terraform.tfstate.backup
+terraform/jenkins/terraform.tfstate
+terraform/jenkins/terraform.tfstate.backup
+terraform/cluster-controller/terraform.tfstate
+terraform/cluster-controller/terraform.tfstate.backup
+terraform/cluster-controller/terraform.tfstate.d

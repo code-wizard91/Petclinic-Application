@@ -1,0 +1,25 @@
+- name: adding repo
+  become: true
+  shell: curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+
+- name: install nodeJs
+  become: true
+  shell: sudo apt -y install nodejs
+
+- name: install angular
+  shell: sudo npm install -g @angular/cli@8
+  become: true
+
+- name: install angular local
+  shell: sudo npm install --save-dev @angular/cli
+  become: true
+
+- name: install maven (and other packages if needed)
+  become: yes
+  apt: pkg={{ item }} state=latest update_cache=yes cache_valid_time=3600
+  with_items:
+    - maven
+
+- name: install jdk
+  become: true
+  shell: sudo apt install default-jdk -y

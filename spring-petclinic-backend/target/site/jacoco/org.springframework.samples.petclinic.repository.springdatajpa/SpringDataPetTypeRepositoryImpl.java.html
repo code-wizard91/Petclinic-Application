@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SpringDataPetTypeRepositoryImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-petclinic-rest</a> &gt; <a href="index.source.html" class="el_package">org.springframework.samples.petclinic.repository.springdatajpa</a> &gt; <span class="el_source">SpringDataPetTypeRepositoryImpl.java</span></div><h1>SpringDataPetTypeRepositoryImpl.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.repository.springdatajpa;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.springframework.context.annotation.Profile;
+import org.springframework.samples.petclinic.model.Pet;
+import org.springframework.samples.petclinic.model.PetType;
+import org.springframework.samples.petclinic.model.Visit;
+
+/**
+ * @author Vitaliy Fedoriv
+ *
+ */
+
+@Profile(&quot;spring-data-jpa&quot;)
+<span class="fc" id="L36">public class SpringDataPetTypeRepositoryImpl implements PetTypeRepositoryOverride {</span>
+	
+	@PersistenceContext
+    private EntityManager em;
+
+	@SuppressWarnings(&quot;unchecked&quot;)
+	@Override
+	public void delete(PetType petType) {
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">        this.em.remove(this.em.contains(petType) ? petType : this.em.merge(petType));</span>
+<span class="fc" id="L45">		Integer petTypeId = petType.getId();</span>
+		
+<span class="fc" id="L47">		List&lt;Pet&gt; pets = this.em.createQuery(&quot;SELECT pet FROM Pet pet WHERE type_id=&quot; + petTypeId).getResultList();</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">		for (Pet pet : pets){</span>
+<span class="fc" id="L49">			List&lt;Visit&gt; visits = pet.getVisits();</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">			for (Visit visit : visits){</span>
+<span class="fc" id="L51">				this.em.createQuery(&quot;DELETE FROM Visit visit WHERE id=&quot; + visit.getId()).executeUpdate();</span>
+<span class="fc" id="L52">			}</span>
+<span class="fc" id="L53">			this.em.createQuery(&quot;DELETE FROM Pet pet WHERE id=&quot; + pet.getId()).executeUpdate();</span>
+<span class="fc" id="L54">		}</span>
+<span class="fc" id="L55">		this.em.createQuery(&quot;DELETE FROM PetType pettype WHERE id=&quot; + petTypeId).executeUpdate();</span>
+<span class="fc" id="L56">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

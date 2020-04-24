@@ -1,0 +1,17 @@
+org/springframework/samples/petclinic/service/userService/UserServiceJdbcTests.class
+org/springframework/samples/petclinic/service/clinicService/ApplicationTestConfig.class
+org/springframework/samples/petclinic/service/userService/UserServiceSpringDataJpaTests.class
+org/springframework/samples/petclinic/rest/PetRestControllerTests.class
+org/springframework/samples/petclinic/model/ValidatorTests.class
+org/springframework/samples/petclinic/service/clinicService/ClinicServiceSpringDataJpaTests.class
+org/springframework/samples/petclinic/rest/SpecialtyRestControllerTests.class
+org/springframework/samples/petclinic/service/clinicService/ClinicServiceJpaTests.class
+org/springframework/samples/petclinic/rest/VisitRestControllerTests.class
+org/springframework/samples/petclinic/service/clinicService/AbstractClinicServiceTests.class
+org/springframework/samples/petclinic/rest/VetRestControllerTests.class
+org/springframework/samples/petclinic/service/userService/UserServiceJpaTests.class
+org/springframework/samples/petclinic/service/clinicService/ClinicServiceJdbcTests.class
+org/springframework/samples/petclinic/rest/PetTypeRestControllerTests.class
+org/springframework/samples/petclinic/service/userService/AbstractUserServiceTests.class
+org/springframework/samples/petclinic/rest/OwnerRestControllerTests.class
+org/springframework/samples/petclinic/rest/UserRestControllerTests.class

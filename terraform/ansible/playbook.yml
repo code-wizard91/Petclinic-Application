@@ -1,0 +1,33 @@
+- name: Update all packages  
+  hosts: all
+  become: true
+  tasks:
+  - name: updating packages
+    command: sudo apt-get update -y
+
+- hosts: jenkins
+  become: true
+  roles:
+    - git
+    - geerlingguy.jenkins
+  tasks:
+  - name: configuring jenkins user
+    command: sudo usermod -aG sudo jenkins
+
+- hosts: jenkins    
+  become: true
+  tasks:
+  - name: Installing SSHPASS  
+    command: sudo apt-get install sshpass
+
+- name: Setting up Kubernetes controller vm and installing docker
+  hosts: kubecontrol
+  become: true
+  roles:
+    - angular-node-npm
+    - docker  
+  tasks:
+  - name: Installing Kubectl
+    command: "{{item}}"
+    with_items:
+     - sudo az aks install-cli

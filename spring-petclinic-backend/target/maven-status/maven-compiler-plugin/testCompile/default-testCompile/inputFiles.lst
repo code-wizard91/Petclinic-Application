@@ -1,0 +1,17 @@
+/home/mizan/spring-petclinic-rest/src/test/java/org/springframework/samples/petclinic/rest/UserRestControllerTests.java
+/home/mizan/spring-petclinic-rest/src/test/java/org/springframework/samples/petclinic/model/ValidatorTests.java
+/home/mizan/spring-petclinic-rest/src/test/java/org/springframework/samples/petclinic/rest/PetRestControllerTests.java
+/home/mizan/spring-petclinic-rest/src/test/java/org/springframework/samples/petclinic/service/clinicService/AbstractClinicServiceTests.java
+/home/mizan/spring-petclinic-rest/src/test/java/org/springframework/samples/petclinic/rest/OwnerRestControllerTests.java
+/home/mizan/spring-petclinic-rest/src/test/java/org/springframework/samples/petclinic/service/userService/UserServiceJdbcTests.java
+/home/mizan/spring-petclinic-rest/src/test/java/org/springframework/samples/petclinic/service/clinicService/ClinicServiceJdbcTests.java
+/home/mizan/spring-petclinic-rest/src/test/java/org/springframework/samples/petclinic/rest/PetTypeRestControllerTests.java
+/home/mizan/spring-petclinic-rest/src/test/java/org/springframework/samples/petclinic/service/userService/UserServiceJpaTests.java
+/home/mizan/spring-petclinic-rest/src/test/java/org/springframework/samples/petclinic/service/clinicService/ApplicationTestConfig.java
+/home/mizan/spring-petclinic-rest/src/test/java/org/springframework/samples/petclinic/service/clinicService/ClinicServiceJpaTests.java
+/home/mizan/spring-petclinic-rest/src/test/java/org/springframework/samples/petclinic/service/userService/AbstractUserServiceTests.java
+/home/mizan/spring-petclinic-rest/src/test/java/org/springframework/samples/petclinic/service/clinicService/ClinicServiceSpringDataJpaTests.java
+/home/mizan/spring-petclinic-rest/src/test/java/org/springframework/samples/petclinic/rest/VetRestControllerTests.java
+/home/mizan/spring-petclinic-rest/src/test/java/org/springframework/samples/petclinic/rest/VisitRestControllerTests.java
+/home/mizan/spring-petclinic-rest/src/test/java/org/springframework/samples/petclinic/rest/SpecialtyRestControllerTests.java
+/home/mizan/spring-petclinic-rest/src/test/java/org/springframework/samples/petclinic/service/userService/UserServiceSpringDataJpaTests.java

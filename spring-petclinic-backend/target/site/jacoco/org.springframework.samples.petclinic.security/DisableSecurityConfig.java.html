@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DisableSecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-petclinic-rest</a> &gt; <a href="index.source.html" class="el_package">org.springframework.samples.petclinic.security</a> &gt; <span class="el_source">DisableSecurityConfig.java</span></div><h1>DisableSecurityConfig.java</h1><pre class="source lang-java linenums">package org.springframework.samples.petclinic.security;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+/**
+ * Starting from Spring Boot 2, if Spring Security is present, endpoints are secured by default
+ * using Spring Security’s content-negotiation strategy.
+ */
+@Configuration
+@ConditionalOnProperty(name = &quot;petclinic.security.enable&quot;, havingValue = &quot;false&quot;)
+<span class="nc" id="L14">public class DisableSecurityConfig extends WebSecurityConfigurerAdapter {</span>
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        // @formatter:off
+<span class="nc" id="L19">        http</span>
+<span class="nc" id="L20">            .authorizeRequests()</span>
+<span class="nc" id="L21">                .anyRequest().permitAll()</span>
+<span class="nc" id="L22">                .and()</span>
+<span class="nc" id="L23">            .csrf()</span>
+<span class="nc" id="L24">                .disable();</span>
+        // @formatter:on
+<span class="nc" id="L26">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
