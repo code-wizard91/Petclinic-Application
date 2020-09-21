@@ -1,4 +1,4 @@
-# QACFinalProject
+# Kubernetes Deployment Project
 
 ## Contents 
 * [Introduction](#Introduction)  
